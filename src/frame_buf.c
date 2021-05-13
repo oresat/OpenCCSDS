@@ -60,28 +60,6 @@ void fb_free(fb_t *fb)
     __fb_free(fb);
 }
 
-
-void fb_post(void *queue, fb_t *fb)
-{
-    if (fb == NULL) {
-        return;
-    }
-    __fb_post(queue, fb);
-}
-
-void fb_post_first(void *queue, fb_t *fb)
-{
-    if (fb == NULL) {
-        return;
-    }
-    __fb_post_first(queue, fb);
-}
-
-fb_t *fb_get(void *queue)
-{
-    return __fb_get(queue);
-}
-
 void fb_reserve(fb_t *fb, size_t len)
 {
     if (fb == NULL || fb->data != fb->tail || fb->data + len > fb->end) {

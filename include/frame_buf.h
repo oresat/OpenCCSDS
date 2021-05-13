@@ -72,6 +72,9 @@ typedef struct {
     uint8_t         buf[FB_MAX_LEN];/* The actual buffer                    */
 } fb_t;
 
+typedef void (*fb_send_t)(fb_t *fb, void *arg);
+typedef fb_t *(*fb_recv_t)(void *arg);
+
 /** @} */
 
 /*===========================================================================*/
@@ -87,16 +90,9 @@ extern "C" {
 #endif
 
 fb_t *__fb_alloc(void);
-void __fb_free(fb_t *fb);
 fb_t *fb_alloc(size_t len);
+void __fb_free(fb_t *fb);
 void fb_free(fb_t *fb);
-
-void __fb_post(void *queue, fb_t *fb);
-void __fb_post_first(void *queue, fb_t *fb);
-fb_t *__fb_get(void *queue);
-void fb_post(void *queue, fb_t *fb);
-void fb_post_first(void *queue, fb_t *fb);
-fb_t *fb_get(void *queue);
 
 void fb_reserve(fb_t *fb, size_t len);
 void *fb_put(fb_t *fb, size_t len);

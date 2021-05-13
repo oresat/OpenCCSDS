@@ -217,7 +217,7 @@ typedef struct {
     /* For UPID_SPP_ENCAPS */
     size_t          max_pkt_len;    /** Maximum Packet Length                    */
     bool            incomplete;     /** Delivery of incomplete packets required  */
-    void (*map_recv)(fb_t *fb);     /** MAP Service Receive                      */
+    fb_recv_t       map_recv;       /** MAP Service Receive                      */
     size_t          pvn_cnt;        /** Count of valid packet version numbers    */
     ccsds_pvn_t     pvn[];          /** Valid Packet Version Numbers             */
 } uslp_map_t;
@@ -240,8 +240,8 @@ typedef struct {
     void            *lock_arg;      /** Arugment to (un)lock functions           */
     void (*lock)(void *arg);        /** Function to lock VC                      */
     void (*unlock)(void *arg);      /** Function to unlock VC                    */
-    void (*mc_ocf_recv)(fb_t *fb);  /** Master Channel OCF Service Receive       */
-    void (*vcf_recv)(fb_t *fb);     /** Virtual Channel Frame Service Receive    */
+    fb_recv_t       mc_ocf_recv;    /** Master Channel OCF Service Receive       */
+    fb_recv_t       vcf_recv;       /** Virtual Channel Frame Service Receive    */
 #if USLP_USE_SDLS == 1
     bool            has_sdls_hdr;   /** SDLS Header applicable                   */
     bool            has_sdls_tlr;   /** SDLS Trailer applicable                  */
@@ -259,8 +259,8 @@ typedef struct {
     bool            fixed;          /** (1) Fixed or (0) Variable Length Channel */
     uint16_t        scid;           /** Spacecraft Identifier                    */
     const uslp_vc_t *vcid[63];      /** Virtual Channels                         */
-    void (*insert_recv)(fb_t *fb);  /** Insert Service Receive                   */
-    void (*mcf_recv)(fb_t *fb);     /** Master Channel Frame Service Receive     */
+    fb_recv_t       insert_recv;    /** Insert Service Receive                   */
+    fb_recv_t       mcf_recv;       /** Master Channel Frame Service Receive     */
 } uslp_mc_t;
 /** @} */
 
@@ -277,8 +277,8 @@ typedef struct {
     uslp_fecf_t     fecf;           /** Frame Error Control Field Implementation */
     size_t          fecf_len;       /** Frame Error Control Field Length (octets)*/
     bool            gen_oid;        /** Generate OID Frame                       */
-    void (*phy_send)(fb_t *fb);     /** Function to send a frame                 */
-    void (*phy_send_prio)(fb_t *fb);/** Function to send a priority frame first  */
+    fb_send_t       phy_send;       /** Function to send a frame                 */
+    fb_send_t       phy_send_ahead; /** Function to send a frame ahead of others */
     uint32_t (*crc32)(const uint8_t block[], size_t len, uint16_t crc);
     uint16_t (*crc16)(const uint8_t block[], size_t len, uint16_t crc);
 } uslp_pc_t;
