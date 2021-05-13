@@ -1,8 +1,9 @@
 CCSDS_ROOT ?= .
 
-CCSDS_INC =	$(CCSDS_ROOT)/include
-CCSDS_SRC =	$(CCSDS_ROOT)/frame_buf.c	\
-			$(CCSDS_ROOT)/uslp.c		\
-			$(CCSDS_ROOT)/cop.c			\
-			$(CCSDS_ROOT)/spp.c			\
-			$(CCSDS_ROOT)/sdls.c
+CCSDS_INC :=	$(CCSDS_ROOT)/include
+CCSDS_SRCDIR :=	$(CCSDS_ROOT)/src
+CCSDS_SRC :=	$(CCSDS_SRCDIR)/frame_buf.c	\
+				$(CCSDS_SRCDIR)/uslp.c		\
+				$(CCSDS_SRCDIR)/cop.c		\
+				$(CCSDS_SRCDIR)/spp.c		\
+				$(CCSDS_SRCDIR)/sdls.c
