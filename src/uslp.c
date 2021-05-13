@@ -227,7 +227,7 @@ static void uslp_map_recv(const uslp_map_t *map, fb_t *fb)
     }
 
     if (map->map_recv)
-        map->map_recv(fb);
+        map->map_recv(fb, map->map_arg);
 }
 
 /*===========================================================================*/
@@ -250,7 +250,7 @@ int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid
     tfph = uslp_vc_gen(vc, fb, expedite);
     tfph->id = uslp_gen_id(mc->scid, vcid, mapid);
     tfph->len = uslp_fecf_gen(pc, fb);
-    pc->phy_send(fb);
+    pc->phy_send(fb, pc->send_arg);
 
     return 0;
 }
@@ -330,7 +330,7 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
     if (pc->insert_zone) {
         /* TODO: Extract IN_SDU */
         if (mc->insert_recv)
-            mc->insert_recv(fb);
+            mc->insert_recv(fb, mc->insert_arg);
     }
 
     /* Demux MC */
@@ -338,7 +338,7 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
 
     /* MCF Service */
     if (mc->mcf_recv)
-        mc->mcf_recv(fb);
+        mc->mcf_recv(fb, mc->mcf_arg);
 
     /* USLP_MC_OCF Service */
     /* TODO: Handle MC_OCF */
@@ -350,7 +350,7 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
 
     /* VCF Service */
     if (vc->vcf_recv)
-        vc->vcf_recv(fb);
+        vc->vcf_recv(fb, vc->vcf_arg);
 
     /* VC Reception */
     uslp_vc_recv(vc, fb);

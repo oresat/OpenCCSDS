@@ -218,6 +218,7 @@ typedef struct {
     size_t          max_pkt_len;    /** Maximum Packet Length                    */
     bool            incomplete;     /** Delivery of incomplete packets required  */
     fb_recv_t       map_recv;       /** MAP Service Receive                      */
+    void            *map_arg;       /** Optional MAP Receive function argument   */
     size_t          pvn_cnt;        /** Count of valid packet version numbers    */
     ccsds_pvn_t     pvn[];          /** Valid Packet Version Numbers             */
 } uslp_map_t;
@@ -242,6 +243,8 @@ typedef struct {
     void (*unlock)(void *arg);      /** Function to unlock VC                    */
     fb_recv_t       mc_ocf_recv;    /** Master Channel OCF Service Receive       */
     fb_recv_t       vcf_recv;       /** Virtual Channel Frame Service Receive    */
+    void            *mc_ocf_arg;    /** Optional MC OCF Receive function argument*/
+    void            *vcf_arg;       /** Optional VCF Receive function argument   */
 #if USLP_USE_SDLS == 1
     bool            has_sdls_hdr;   /** SDLS Header applicable                   */
     bool            has_sdls_tlr;   /** SDLS Trailer applicable                  */
@@ -261,6 +264,8 @@ typedef struct {
     const uslp_vc_t *vcid[63];      /** Virtual Channels                         */
     fb_recv_t       insert_recv;    /** Insert Service Receive                   */
     fb_recv_t       mcf_recv;       /** Master Channel Frame Service Receive     */
+    void            *insert_arg;    /** Optional Insert Receive function argument*/
+    void            *mcf_arg;       /** Optional MCF Receive function argument   */
 } uslp_mc_t;
 /** @} */
 
@@ -279,6 +284,8 @@ typedef struct {
     bool            gen_oid;        /** Generate OID Frame                       */
     fb_send_t       phy_send;       /** Function to send a frame                 */
     fb_send_t       phy_send_ahead; /** Function to send a frame ahead of others */
+    void            *send_arg;      /** Optional send function argument          */
+    void            *send_ahead_arg;/** Optional send ahead function argument    */
     uint32_t (*crc32)(const uint8_t block[], size_t len, uint16_t crc);
     uint16_t (*crc16)(const uint8_t block[], size_t len, uint16_t crc);
 } uslp_pc_t;
