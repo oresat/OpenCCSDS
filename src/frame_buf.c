@@ -33,13 +33,13 @@ static const fb_t empty_frame = {0};
 /* Exported functions.                                                       */
 /*===========================================================================*/
 
-fb_t *fb_alloc(size_t len)
+fb_t *fb_alloc(size_t len, void *arg)
 {
     if (len > FB_MAX_LEN) {
         return NULL;
     }
 
-    fb_t *fb = __fb_alloc();
+    fb_t *fb = __fb_alloc(len, arg);
     if (fb != NULL) {
         *fb = empty_frame;
         fb->max_len = FB_MAX_LEN;
@@ -52,12 +52,12 @@ fb_t *fb_alloc(size_t len)
     return fb;
 }
 
-void fb_free(fb_t *fb)
+void fb_free(fb_t *fb, void *arg)
 {
     if (fb == NULL) {
         return;
     }
-    __fb_free(fb);
+    __fb_free(fb, arg);
 }
 
 void fb_reserve(fb_t *fb, size_t len)

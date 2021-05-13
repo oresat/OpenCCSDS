@@ -89,10 +89,10 @@ typedef fb_t *(*fb_recv_t)(void *arg);
 extern "C" {
 #endif
 
-fb_t *__fb_alloc(void);
-fb_t *fb_alloc(size_t len);
-void __fb_free(fb_t *fb);
-void fb_free(fb_t *fb);
+fb_t *__fb_alloc(size_t len, void *arg);
+fb_t *fb_alloc(size_t len, void *arg);
+void __fb_free(fb_t *fb, void *arg);
+void fb_free(fb_t *fb, void *arg);
 
 void fb_reserve(fb_t *fb, size_t len);
 void *fb_put(fb_t *fb, size_t len);
