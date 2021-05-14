@@ -72,8 +72,10 @@ typedef struct {
     uint8_t         buf[FB_MAX_LEN];/* The actual buffer                    */
 } fb_t;
 
-typedef void (*fb_send_t)(fb_t *fb, void *arg);
-typedef fb_t *(*fb_recv_t)(void *arg);
+typedef void (*sdu_recv_t)(fb_t *fb, void *arg);
+typedef void (*pdu_send_t)(fb_t *fb, void *arg);
+typedef fb_t *(*sdu_send_t)(void *arg);
+typedef fb_t *(*pdu_recv_t)(void *arg);
 
 /** @} */
 
