@@ -27,19 +27,20 @@
 /**
  * Generate USLP TFPH ID field
  */
-static inline uint32_t uslp_gen_id(uint16_t scid, uint8_t vcid, uint8_t mapid)
+static inline uint32_t uslp_gen_id(uint16_t scid, uint8_t vcid, uint8_t mapid, bool owner)
 {
     return __builtin_bswap32(
                 USLP_TFVN   << USLP_TFPH_ID_TFVN_Pos |
                 scid        << USLP_TFPH_ID_SCID_Pos |
                 vcid        << USLP_TFPH_ID_VCID_Pos |
-                mapid       << USLP_TFPH_ID_MAPID_Pos);
+                mapid       << USLP_TFPH_ID_MAPID_Pos|
+                (owner ? 0 : USLP_TFPH_ID_SRC_DST));
 }
 
 /**
  * Parse USLP TFPH ID field into component pieces
  */
-static inline bool uslp_parse_id(uint32_t id, uint16_t scid_match, uint16_t *scid, uint8_t *vcid, uint8_t *mapid)
+static inline bool uslp_parse_id(uint32_t id, uint16_t scid_match, uint16_t *scid, uint8_t *vcid, uint8_t *mapid, bool owner)
 {
     id = __builtin_bswap32(id);
     /* Must be USLP frame */
@@ -48,6 +49,8 @@ static inline bool uslp_parse_id(uint32_t id, uint16_t scid_match, uint16_t *sci
     /* Must match SCID */
     *scid = (id & USLP_TFPH_ID_SCID) >> USLP_TFPH_ID_SCID_Pos;
     if (*scid != scid_match)
+        return false;
+    if (!(owner && (id & USLP_TFPH_ID_SRC_DST)))
         return false;
     /* Parse VC and MAP */
     *vcid = (id & USLP_TFPH_ID_VCID) >> USLP_TFPH_ID_VCID_Pos;
@@ -248,7 +251,7 @@ int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid
 
     uslp_map_gen(map, fb);
     tfph = uslp_vc_gen(vc, fb, expedite);
-    tfph->id = uslp_gen_id(mc->scid, vcid, mapid);
+    tfph->id = uslp_gen_id(mc->scid, vcid, mapid, mc->owner);
     tfph->len = uslp_fecf_gen(pc, fb);
     pc->phy_send(fb, pc->send_arg);
 
@@ -323,7 +326,7 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
         return false;
 
     /* Parse out IDs */
-    if (!uslp_parse_id(tfph->id, mc->scid, &scid, &vcid, &mapid))
+    if (!uslp_parse_id(tfph->id, mc->scid, &scid, &vcid, &mapid, mc->owner))
         return false;
 
     /* Insert Service */
