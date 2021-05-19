@@ -5,6 +5,8 @@
  * @addtogroup CCSDS
  * @{
  */
+#include <string.h>
+
 #include "uslp.h"
 #include "cop.h"
 
@@ -129,18 +131,20 @@ static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, bool expedite)
 static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
 {
     uint16_t len = fb->len;
-    void *crc;
+    uint32_t *crc;
     switch (pc->fecf) {
     case FECF_SW:
 #if (0)
-        crc = fb_put(fb, pc->fecf_len);
-        /* TODO: Verify this implements correctly */
-        if (pc->fecf_len == 2 && pc->crc16) {
-            *((uint16_t*)crc) = __builtin_bswap16(pc->crc16(fb->data, len, 0));
-        } else if (pc->fecf_len == 4 && pc->crc32) {
-            *((uint32_t*)crc) = __builtin_bswap32(pc->crc32(fb->data, len, 0));
-        } else {
-            break;
+        if (pc->crc) {
+            /* TODO: Verify this implements correctly */
+            crc = fb_put(fb, pc->fecf_len);
+            memset(crc, 0, pc->fecf_len);
+            pc->crc(fb->data, len, crc);
+            if (pc->fecf_len == 2) {
+                *crc = __builtin_bswap16(*crc);
+            } else if (pc->fecf_len == 4) {
+                *crc = __builtin_bswap32(*crc);
+            }
         }
 #else
         (void)crc;
@@ -157,17 +161,18 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
 static bool uslp_fecf_recv(const uslp_pc_t *pc, fb_t *fb)
 {
     uint16_t len = fb->len - pc->fecf_len;
-    uint32_t crc;
+    uint32_t crc = 0;
     switch (pc->fecf) {
     case FECF_SW:
 #if (0)
         /* TODO: Verify this implements correctly */
-        if (pc->fecf_len == 2 && pc->crc16) {
-            crc = __builtin_bswap16(pc->crc16(fb->data, len, 0));
-        } else if (pc->fecf_len == 4 && pc->crc32) {
-            crc = __builtin_bswap32(pc->crc32(fb->data, len, 0));
-        } else {
-            return false;
+        if (pc->crc) {
+            pc->crc(fb->data, len, &crc);
+            if (pc->fecf_len == 2) {
+                crc = __builtin_bswap16(crc);
+            } else if (pc->fecf_len == 4) {
+                crc = __builtin_bswap32(crc);
+            }
         }
         if (memcmp(&crc, &fb->data[len], pc->fecf_len)) {
             return false;

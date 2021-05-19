@@ -287,8 +287,7 @@ typedef struct {
     pdu_send_t      phy_send_ahead; /** Function to send a frame ahead of others */
     void            *send_arg;      /** Optional send function argument          */
     void            *send_ahead_arg;/** Optional send ahead function argument    */
-    uint32_t (*crc32)(const uint8_t block[], size_t len, uint16_t crc);
-    uint16_t (*crc16)(const uint8_t block[], size_t len, uint16_t crc);
+    void (*crc)(const uint8_t block[], size_t len, void *crc);
 } uslp_pc_t;
 /** @} */
 
