@@ -134,11 +134,10 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
     uint32_t *crc;
     switch (pc->fecf) {
     case FECF_SW:
-#if (0)
+        crc = fb_put(fb, pc->fecf_len);
+        memset(crc, 0, pc->fecf_len);
         if (pc->crc) {
             /* TODO: Verify this implements correctly */
-            crc = fb_put(fb, pc->fecf_len);
-            memset(crc, 0, pc->fecf_len);
             pc->crc(fb->data, len, crc);
             if (pc->fecf_len == 2) {
                 *crc = __builtin_bswap16(*crc);
@@ -146,9 +145,6 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
                 *crc = __builtin_bswap32(*crc);
             }
         }
-#else
-        (void)crc;
-#endif
     case FECF_HW:
         len += pc->fecf_len;
     case FECF_NONE:
@@ -164,7 +160,6 @@ static bool uslp_fecf_recv(const uslp_pc_t *pc, fb_t *fb)
     uint32_t crc = 0;
     switch (pc->fecf) {
     case FECF_SW:
-#if (0)
         /* TODO: Verify this implements correctly */
         if (pc->crc) {
             pc->crc(fb->data, len, &crc);
@@ -173,15 +168,10 @@ static bool uslp_fecf_recv(const uslp_pc_t *pc, fb_t *fb)
             } else if (pc->fecf_len == 4) {
                 crc = __builtin_bswap32(crc);
             }
+            if (memcmp(&crc, &fb->data[len], pc->fecf_len)) {
+                return false;
+            }
         }
-        if (memcmp(&crc, &fb->data[len], pc->fecf_len)) {
-            return false;
-        }
-#else
-        (void)crc;
-        (void)len;
-        return false;
-#endif
     case FECF_HW:
         fb_trim(fb, pc->fecf_len);
     case FECF_NONE:
