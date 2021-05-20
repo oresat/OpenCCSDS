@@ -52,7 +52,7 @@ static inline bool uslp_parse_id(uint32_t id, uint16_t scid_match, uint16_t *sci
     *scid = (id & USLP_TFPH_ID_SCID) >> USLP_TFPH_ID_SCID_Pos;
     if (*scid != scid_match)
         return false;
-    if (!(owner && (id & USLP_TFPH_ID_SRC_DST)))
+    if (owner != !!(id & USLP_TFPH_ID_SRC_DST))
         return false;
     /* Parse VC and MAP */
     *vcid = (id & USLP_TFPH_ID_VCID) >> USLP_TFPH_ID_VCID_Pos;
