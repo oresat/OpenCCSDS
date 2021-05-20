@@ -145,6 +145,7 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
                 *crc = __builtin_bswap32(*crc);
             }
         }
+        __attribute__((fallthrough));
     case FECF_HW:
         len += pc->fecf_len;
     case FECF_NONE:
@@ -172,6 +173,7 @@ static bool uslp_fecf_recv(const uslp_pc_t *pc, fb_t *fb)
                 return false;
             }
         }
+        __attribute__((fallthrough));
     case FECF_HW:
         fb_trim(fb, pc->fecf_len);
     case FECF_NONE:
