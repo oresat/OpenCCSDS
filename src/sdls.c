@@ -44,7 +44,7 @@ int sdls_send(const sdls_cfg_t *cfg, fb_t *fb)
     iv = fb_push(fb, cfg->iv_len);
     spi = fb_push(fb, sizeof(uint16_t));
     mac = fb_put(fb, cfg->mac_len);
-    *spi = cfg->spi;
+    *spi = __builtin_bswap16(cfg->spi);
 
     if (cfg->send_func != NULL) {
         ret = cfg->send_func(fb->data, fb->len - cfg->mac_len, iv, seq_num, mac, cfg->send_arg);
