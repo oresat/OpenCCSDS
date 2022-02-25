@@ -39,15 +39,15 @@ int sdls_send(const sdls_cfg_t *cfg, fb_t *fb)
     void *seq_num = NULL;
     void *mac = NULL;
 
-    mac = fb_put(fb, cfg->mac_len);
     fb_push(fb, cfg->pad_len);
     seq_num = fb_push(fb, cfg->seq_num_len);
     iv = fb_push(fb, cfg->iv_len);
     spi = fb_push(fb, sizeof(uint16_t));
+    mac = fb_put(fb, cfg->mac_len);
     *spi = cfg->spi;
 
     if (cfg->send_func != NULL) {
-        ret = cfg->send_func(iv, seq_num, mac, cfg->send_arg);
+        ret = cfg->send_func(fb->data, fb->len - cfg->mac_len, iv, seq_num, mac, cfg->send_arg);
     }
 
     return ret;
@@ -75,7 +75,7 @@ int sdls_recv(const sdls_cfg_t *cfg, fb_t *fb)
     }
 
     if (cfg->recv_func != NULL) {
-        ret = cfg->recv_func(hdr->iv, hdr->seq_num, tlr->mac, cfg->recv_arg);
+        ret = cfg->recv_func(fb->data, fb->len - cfg->mac_len, hdr->iv, hdr->seq_num, tlr->mac, cfg->recv_arg);
     }
 
     fb_pull(fb, sizeof(struct sdls_hdr));

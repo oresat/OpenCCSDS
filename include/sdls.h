@@ -29,7 +29,7 @@
 /* Data structures and types.                                                */
 /*===========================================================================*/
 
-typedef int (*spi_func_t)(void *iv, void *seq_num, void *mac, void *arg);
+typedef int (*spi_func_t)(void *data, size_t len, void *iv, void *seq_num, void *mac, void *arg);
 
 /**
  * @name    SDLS Security Parameter Index Configuration
