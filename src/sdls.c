@@ -70,7 +70,7 @@ int sdls_recv(const sdls_cfg_t *cfg, fb_t *fb)
     hdr = (struct sdls_hdr*)fb->data;
     tlr = (struct sdls_tlr*)(fb->tail - cfg->mac_len);
 
-    if (hdr->spi != cfg->spi) {
+    if (__builtin_bswap16(hdr->spi) != cfg->spi) {
         return -1;
     }
 
