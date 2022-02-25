@@ -140,7 +140,7 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
     default:
         break;
     }
-    return __builtin_bswap16(len);
+    return __builtin_bswap16(len - 1);
 }
 
 static bool uslp_fecf_recv(const uslp_pc_t *pc, fb_t *fb)
