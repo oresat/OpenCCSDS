@@ -100,18 +100,6 @@ static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, bool expedite)
     uslp_tfph_t *tfph;
     uint8_t flags = 0;
 
-#if USLP_USE_SDLS == 1
-    sdls_hdr_t *sdls_hdr = NULL;
-    sdls_tlr_t *sdls_tlr = NULL;
-    /* TODO: Call SDLS functions */
-    if (vc->has_sdls_hdr) {
-        sdls_hdr = fb_push(fb, vc->sdls_hdr_len);
-    }
-    if (vc->has_sdls_tlr) {
-        sdls_tlr = fb_put(fb, vc->sdls_tlr_len);
-    }
-#endif
-
     switch (vc->cop) {
     case COP_1:
         flags = cop_fop1(vc, fb, expedite);
@@ -247,6 +235,11 @@ int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid
     const uslp_map_t *map = vc->mapid[mapid];
 
     uslp_map_gen(map, fb);
+#if USLP_USE_SDLS == 1
+    if (vc->sdls_cfg != NULL) {
+        sdls_send(vc->sdls_cfg, fb);
+    }
+#endif
     tfph = uslp_vc_gen(vc, fb, expedite);
     tfph->id = uslp_gen_id(mc->scid, vcid, mapid, mc->owner);
     tfph->len = uslp_fecf_gen(pc, fb);
@@ -354,6 +347,16 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
 
     /* VC Reception */
     uslp_vc_recv(vc, fb);
+
+#if USLP_USE_SDLS == 1
+    /* SDLS Receive */
+    if (vc->sdls_cfg != NULL) {
+        if (sdls_recv(vc->sdls_cfg, fb) != 0) {
+            /* TODO: Real error codes */
+            return false;
+        }
+    }
+#endif
 
     /* Demux MAP */
     map = vc->mapid[mapid];

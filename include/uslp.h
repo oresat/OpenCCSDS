@@ -246,10 +246,7 @@ typedef struct {
     void            *mc_ocf_arg;    /** Optional MC OCF Receive function argument*/
     void            *vcf_arg;       /** Optional VCF Receive function argument   */
 #if USLP_USE_SDLS == 1
-    bool            has_sdls_hdr;   /** SDLS Header applicable                   */
-    bool            has_sdls_tlr;   /** SDLS Trailer applicable                  */
-    size_t          sdls_hdr_len;   /** SDLS Header Length (octets)              */
-    size_t          sdls_tlr_len;   /** SDLS Trailer Length (octets)             */
+    const sdls_cfg_t *sdls_cfg;     /** SDLS SPI Configuration                   */
 #endif
 } uslp_vc_t;
 /** @} */

@@ -5,7 +5,6 @@
  * @addtogroup CCSDS
  * @{
  */
-#include <stdint.h>
 #include "sdls.h"
 
 /*===========================================================================*/
@@ -31,5 +30,57 @@
 /*===========================================================================*/
 /* Exported functions.                                                       */
 /*===========================================================================*/
+
+int sdls_send(const sdls_cfg_t *cfg, fb_t *fb)
+{
+    int ret = 0;
+    uint16_t *spi = NULL;
+    void *iv = NULL;
+    void *seq_num = NULL;
+    void *mac = NULL;
+
+    mac = fb_put(fb, cfg->mac_len);
+    fb_push(fb, cfg->pad_len);
+    seq_num = fb_push(fb, cfg->seq_num_len);
+    iv = fb_push(fb, cfg->iv_len);
+    spi = fb_push(fb, sizeof(uint16_t));
+    *spi = cfg->spi;
+
+    if (cfg->send_func != NULL) {
+        ret = cfg->send_func(iv, seq_num, mac, cfg->send_arg);
+    }
+
+    return ret;
+}
+
+int sdls_recv(const sdls_cfg_t *cfg, fb_t *fb)
+{
+    int ret = 0;
+    /* Create header and trailer structs based on configured SPI */
+    struct __attribute__((packed)) sdls_hdr {
+        uint16_t    spi;
+        uint8_t     iv[cfg->iv_len];
+        uint8_t     seq_num[cfg->seq_num_len];
+        uint8_t     pad[cfg->pad_len];
+    } *hdr;
+    struct __attribute__((packed)) sdls_tlr {
+        uint8_t     mac[cfg->mac_len];
+    } *tlr;
+
+    hdr = (struct sdls_hdr*)fb->data;
+    tlr = (struct sdls_tlr*)(fb->tail - cfg->mac_len);
+
+    if (hdr->spi != cfg->spi) {
+        return -1;
+    }
+
+    if (cfg->recv_func != NULL) {
+        ret = cfg->recv_func(hdr->iv, hdr->seq_num, tlr->mac, cfg->recv_arg);
+    }
+
+    fb_pull(fb, sizeof(struct sdls_hdr));
+    fb_trim(fb, sizeof(struct sdls_tlr));
+    return ret;
+}
 
 /** @} */
