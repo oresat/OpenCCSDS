@@ -257,7 +257,7 @@ typedef struct {
  */
 typedef struct {
     bool            fixed;          /** (1) Fixed or (0) Variable Length Channel */
-    uint16_t        scid;           /** Spacecraft Identifier                    */
+    uint16_t        *scid;          /** Spacecraft Identifier                    */
     bool            owner;          /** SCID Owner (Source for TX, Dest for RX)  */
     const uslp_vc_t *vcid[63];      /** Virtual Channels                         */
     sdu_recv_t      insert_recv;    /** Insert Service Receive                   */

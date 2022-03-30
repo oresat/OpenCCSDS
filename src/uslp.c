@@ -241,7 +241,7 @@ int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid
     }
 #endif
     tfph = uslp_vc_gen(vc, fb, expedite);
-    tfph->id = uslp_gen_id(mc->scid, vcid, mapid, mc->owner);
+    tfph->id = uslp_gen_id(*(mc->scid), vcid, mapid, mc->owner);
     tfph->len = uslp_fecf_gen(pc, fb);
     pc->phy_send(fb, pc->send_arg);
 
@@ -316,7 +316,7 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
         return false;
 
     /* Parse out IDs */
-    if (!uslp_parse_id(tfph->id, mc->scid, &scid, &vcid, &mapid, mc->owner))
+    if (!uslp_parse_id(tfph->id, *(mc->scid), &scid, &vcid, &mapid, mc->owner))
         return false;
 
     /* Insert Service */
